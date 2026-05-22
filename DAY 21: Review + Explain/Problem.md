@@ -1,0 +1,2 @@
+- Explain window functions **without writing code**.
+- Practice explaining to a non-technical audience.
