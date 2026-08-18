@@ -1,22 +1,298 @@
-# 30-Days-of-SQL-with-AdventureWorks
-A 30-day SQL practice project using AdventureWorks OLTP and DW databases, focusing on real-world data analyst scenarios, T-SQL queries, and business insights.
+# AdventureWorks Sales & Customer Analytics
 
-Project Overview
+### T-SQL | SQL Server | Customer Analytics | Sales Analysis | Window Functions
 
-This repository documents my 30-day SQL challenge using the AdventureWorks OLTP and Data Warehouse databases.
-The goal is to strengthen my T-SQL skills while practicing real-world data analyst scenarios such as joins, CTEs, window functions, KPI analysis, and business reporting.
+A business-focused SQL analytics project using the AdventureWorks OLTP and
+AdventureWorksDW databases to analyse sales performance, customer behaviour,
+product trends and data quality.
 
-What this project covers
-T-SQL querying
-OLTP and Data Warehouse analysis
-Joins, subqueries, and CTEs
-Window functions and analytics
-Business insights and decision-making
+The project demonstrates how I use T-SQL to move from business questions to
+validated analytical results and interpretable business insights.
 
-Tools used
-SQL Server 2019
-T-SQL
-AdventureWorks OLTP and AdventureWorksDW
+---
 
-Why this project
-I am returning from a career break and using this challenge to rebuild momentum, sharpen my SQL skills, and create a transparent learning portfolio that reflects how I think as a data analyst.
+## 📌 Project Overview
+
+Business analysts rarely receive a perfectly defined SQL question.
+
+More often, stakeholders ask questions such as:
+
+- Who are our highest-value customers?
+- Which products are performing best?
+- How is revenue changing over time?
+- Which customers may be becoming inactive?
+- Which products are declining in sales?
+- How does performance vary across regions?
+- Are there data-quality issues that could affect reporting?
+
+This project uses AdventureWorks data to investigate these types of questions
+using progressively more advanced SQL techniques.
+
+The analysis covers transactional querying, multi-table joins, customer and
+product analysis, time-series analysis, data validation and advanced window
+functions.
+
+---
+
+## 🎯 Project Objectives
+
+The project aims to demonstrate the ability to:
+
+- Translate business questions into SQL queries
+- Navigate relational database structures
+- Combine data across multiple tables
+- Analyse sales, customer and product performance
+- Identify trends and changes over time
+- Segment and rank customers
+- Perform data-quality validation
+- Use window functions for advanced analytical problems
+- Validate query results before drawing conclusions
+- Translate technical output into business-friendly insights
+
+---
+
+## 🗄️ Data Sources
+
+Two Microsoft sample databases are used.
+
+### AdventureWorks OLTP
+
+Used primarily for transactional analysis involving:
+
+- Sales orders
+- Customers
+- Products
+- Product categories and subcategories
+- Geographic information
+- Order-level analysis
+
+### AdventureWorksDW
+
+Used for analytical scenarios involving:
+
+- Historical sales performance
+- Customer analysis
+- Product performance
+- Time-series analysis
+- Ranking and segmentation
+- Advanced window functions
+
+---
+
+## 🔍 Key Areas of Analysis
+
+### 1. Sales Performance Analysis
+
+SQL queries are used to analyse sales at different levels of detail,
+including:
+
+- Total sales
+- Sales by year
+- Sales by customer
+- Average order value
+- Orders by region
+- Monthly sales trends
+- Month-over-month performance
+
+This provides a foundation for understanding overall business performance.
+
+---
+
+### 2. Customer Analytics
+
+Customer-level analysis explores purchasing behaviour and customer value.
+
+Examples include:
+
+- Identifying top customers by sales
+- Comparing customer spend with average customer spend
+- Customer value segmentation
+- Ranking customers by performance
+- Identifying repeat customers
+- Analysing time between purchases
+- Approximating customer lifetime value
+- Identifying potentially inactive customers
+
+---
+
+### 3. Product Performance
+
+Product analysis is used to understand performance both overall and within
+individual categories.
+
+Analysis includes:
+
+- Identifying products that have never been sold
+- Comparing product prices with category averages
+- Ranking products within categories
+- Identifying top-performing products
+- Identifying declining products
+- Comparing product performance using window functions
+
+---
+
+### 4. Time-Series Analysis
+
+Time-based SQL analysis is used to understand how performance changes over
+time.
+
+Techniques include:
+
+- Monthly and yearly aggregation
+- Running totals
+- Month-over-month comparisons
+- `LAG()` and `LEAD()`
+- Cumulative sales analysis
+- Identification of periods of sales decline
+
+---
+
+### 5. Data Quality Analysis
+
+Before relying on analytical results, SQL is used to investigate potential
+data-quality problems.
+
+Checks include:
+
+- Missing customer information
+- Duplicate records
+- Unexpected zero values
+- Negative values where inappropriate
+- Validation of relationships between tables
+
+Data-quality validation is treated as part of the analytical process rather
+than a separate afterthought.
+
+---
+
+## 🧠 SQL Techniques Demonstrated
+
+| Area | Techniques |
+|---|---|
+| Core Querying | `SELECT`, `WHERE`, `ORDER BY` |
+| Relational Analysis | `INNER JOIN`, `LEFT JOIN`, multi-table joins |
+| Aggregation | `SUM`, `AVG`, `COUNT`, `GROUP BY` |
+| Business Logic | `CASE` expressions |
+| Advanced Filtering | Subqueries |
+| Reusable Logic | Common Table Expressions (CTEs) |
+| Ranking | `ROW_NUMBER()`, `RANK()`, `DENSE_RANK()` |
+| Analytical SQL | `OVER()`, `PARTITION BY` |
+| Time-Series Analysis | `LAG()`, `LEAD()` |
+| Cumulative Analysis | Running totals |
+| Data Validation | Missing values, duplicates and invalid values |
+| Customer Analytics | Segmentation, repeat behaviour and purchase frequency |
+
+---
+
+## 💡 Featured Analytical Scenarios
+
+### Customer Value Segmentation
+
+Customer sales performance is aggregated and analysed to distinguish between
+different levels of customer value.
+
+Techniques used include:
+
+`SUM()` • `CASE` • CTEs • Ranking Functions
+
+This type of analysis can support customer prioritisation and targeted
+business strategies.
+
+---
+
+### Product Ranking Within Categories
+
+Window functions are used to compare products within their respective
+categories rather than only across the entire product portfolio.
+
+Techniques used include:
+
+`PARTITION BY` • `ROW_NUMBER()` • `RANK()` • `DENSE_RANK()`
+
+This allows top-performing products to be identified within meaningful
+business groups.
+
+---
+
+### Month-over-Month Sales Analysis
+
+Historical sales are compared across consecutive periods to identify changes
+in performance.
+
+Techniques used include:
+
+`LAG()` • Date Functions • Aggregation • Window Functions
+
+This makes it possible to identify periods of growth or decline and investigate
+changes in sales performance.
+
+---
+
+### Running Sales Performance
+
+Running totals are used to evaluate cumulative sales over time and monitor
+progress against performance thresholds.
+
+Techniques used include:
+
+`SUM() OVER()` • `ORDER BY` • `PARTITION BY`
+
+---
+
+### Customer Purchase Behaviour
+
+Customer purchase history is analysed to understand repeat behaviour,
+purchase frequency and the time between transactions.
+
+This extends the analysis beyond basic revenue reporting into customer
+behaviour analytics.
+
+---
+
+## 🔄 Analytical Workflow
+
+My approach throughout the project follows a consistent process:
+
+**Business Question**
+
+↓
+
+**Identify Relevant Tables**
+
+↓
+
+**Understand Table Relationships**
+
+↓
+
+**Write SQL Query**
+
+↓
+
+**Validate Results**
+
+↓
+
+**Analyse Output**
+
+↓
+
+**Translate Findings Into Business Language**
+
+The objective is not simply to produce syntactically correct SQL, but to use
+SQL as an analytical tool for business decision-making.
+
+---
+
+## 📂 Repository Structure
+
+The analysis is organised into individual modules.
+
+Typical structure:
+
+```text
+Day XX/
+│
+├── problem.md
+├── solution.sql
+└── insights.md
