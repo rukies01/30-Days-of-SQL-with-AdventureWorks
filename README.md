@@ -296,3 +296,78 @@ Day XX/
 ├── problem.md
 ├── solution.sql
 └── insights.md
+```
+
+### `problem.md`
+
+Documents the analytical questions being investigated.
+
+### `solution.sql`
+
+Contains the T-SQL queries used to solve the analytical problems.
+
+### `insights.md`
+
+Translates query results and observations into understandable analytical
+insights.
+
+This structure separates:
+
+**Business Problem → Technical Solution → Analytical Interpretation**
+
+---
+
+## 🛠️ Tools & Technologies
+
+- Microsoft SQL Server
+- SQL Server Management Studio (SSMS)
+- T-SQL
+- AdventureWorks OLTP
+- AdventureWorksDW
+- Git
+- GitHub
+
+---
+
+## 📈 Skills Demonstrated
+
+- SQL & T-SQL
+- Relational database analysis
+- Multi-table joins
+- CTEs
+- Window functions
+- Customer analytics
+- Sales analytics
+- Product analysis
+- Time-series analysis
+- Data-quality validation
+- Query refactoring
+- Analytical problem solving
+- Business insight communication
+
+---
+
+## 🚧 Project Status
+
+This is an ongoing analytical SQL project.
+
+**21 analytical modules have currently been completed**, progressing from
+database exploration and relational querying through advanced window functions
+and customer analytics.
+
+Future modules will extend the project into KPI design, funnel analysis,
+anomaly detection, BI-ready reporting queries and an end-to-end business case.
+
+The existing analysis represents the work completed to date and will continue
+to evolve as additional business scenarios are added.
+
+---
+
+## 🎯 Portfolio Purpose
+
+This project demonstrates my ability to use SQL beyond basic data extraction.
+
+The focus is on connecting technical SQL skills with business analysis:
+understanding the question, selecting the appropriate data, building and
+validating the query, and translating the result into information that can
+support decision-making.
