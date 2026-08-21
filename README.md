@@ -9,6 +9,60 @@ product trends and data quality.
 The project demonstrates how I use T-SQL to move from business questions to
 validated analytical results and interpretable business insights.
 
+## ⭐ Featured Analyses
+
+Selected examples from the project highlighting business-focused and advanced T-SQL work.
+
+### Data Quality & Reporting Reliability
+**Day 10 — Data Quality Checks**
+
+Validated analytical data by checking missing customer relationships, duplicate sales records and invalid sales values before downstream reporting.
+
+[View SQL Solution](https://github.com/rukies01/30-Days-of-SQL-with-AdventureWorks/blob/main/Day%2010%3A%20Data%20Quality%20Checks/Solution.sql)  
+[View Insights](https://github.com/rukies01/30-Days-of-SQL-with-AdventureWorks/blob/main/Day%2010%3A%20Data%20Quality%20Checks/insights.md)
+
+---
+
+### Customer & Product Ranking
+**Day 15 — ROW_NUMBER, RANK & DENSE_RANK**
+
+Used ranking functions to identify high-value customers, rank products within categories and identify top-performing products while accounting for ties.
+
+[View SQL Solution](https://github.com/rukies01/30-Days-of-SQL-with-AdventureWorks/blob/main/Day%2015%3A%20ROW_NUMBER%2C%20RANK%2C%20DENSE_RANK/Solution.sql)  
+[View Insights](https://github.com/rukies01/30-Days-of-SQL-with-AdventureWorks/blob/main/Day%2015%3A%20ROW_NUMBER%2C%20RANK%2C%20DENSE_RANK/Insights.md)
+
+---
+
+### Cumulative Sales Analysis
+**Day 16 — Running Totals**
+
+Used windowed aggregations to track cumulative sales over time and explore threshold-crossing analytical patterns.
+
+[View SQL Solution](https://github.com/rukies01/30-Days-of-SQL-with-AdventureWorks/blob/main/Day%2016%3A%20Running%20Totals/solution.sql)  
+[View Insights](https://github.com/rukies01/30-Days-of-SQL-with-AdventureWorks/blob/main/Day%2016%3A%20Running%20Totals/insights.md)
+
+---
+
+### Month-over-Month Performance
+**Day 17 — LAG & LEAD**
+
+Compared current-period revenue with prior periods, calculated month-over-month growth and identified months where sales declined.
+
+[View SQL Solution](https://github.com/rukies01/30-Days-of-SQL-with-AdventureWorks/blob/main/Day%2017%3A%20LAG%20and%20LEAD/solution.sql)  
+[View Insights](https://github.com/rukies01/30-Days-of-SQL-with-AdventureWorks/blob/main/Day%2017%3A%20LAG%20and%20LEAD/insights.md)
+
+---
+
+### Customer Behaviour Analytics
+**Day 20 — Advanced Analytics**
+
+Analysed repeat purchasing, purchase intervals, customer lifespan and customer lifetime value using transaction-level analysis and window functions.
+
+[View SQL Solution](https://github.com/rukies01/30-Days-of-SQL-with-AdventureWorks/blob/main/Day%2020%3A%20Advanced%20Analytics/Solution.sql)  
+[View Insights](https://github.com/rukies01/30-Days-of-SQL-with-AdventureWorks/blob/main/Day%2020%3A%20Advanced%20Analytics/Insights.md)
+
+---
+
 ---
 
 ## 📌 Project Overview
