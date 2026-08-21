@@ -30,16 +30,16 @@ ACTIVITYFLAG AS
 		CASE
 			WHEN OrderVolume > 1 THEN 'Active'
 			ELSE 'Inactive'
-			End as ActivityFlag
+			End as RepeatCustomerFlag
 	FROM BASETABLE
 )
 SELECT * FROM ACTIVITYFLAG
-Where ActivityFlag = 'Active'
+Where RepeatCustomerFlag = 'Active'
 
 2. Time between customer purchases.
 WITH BASETABLE AS
 (
-	SELECT CustomerKey,
+	SELECT DISTINCT CustomerKey,
 		SalesOrderNumber AS SalesOrderNumber,
 		Cast(OrderDate as Date) as CurrentOrderDate
 		from FactInternetSales
@@ -79,10 +79,10 @@ FROM BASETABLE
 
   SELECT F.CustomerKey,
 	Concat(C.FirstName,' ',C.MiddleName, ' ', C.LastName) as CustomerFullName,
-	SUM(SalesAmount) as CustomerLiftimeValue
+	SUM(SalesAmount) as CustomerLifetimeValue
 From FactInternetSales F
 	LEFT JOIN DimCustomer C
 	ON F.CustomerKey = C.CustomerKey
 Group BY F.CustomerKey,
 	Concat(C.FirstName,' ',C.MiddleName, ' ', C.LastName)
-Order by CustomerLiftimeValue desc
+Order by CustomerLifetimeValue desc
