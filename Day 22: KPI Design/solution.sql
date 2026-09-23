@@ -178,7 +178,7 @@ FROM PYRevenue
 10.Revenue contribution: Percentage contribution of a product/customer/category to total revenue
 
 Percentage contribution of products
-WITH BASETABLE AS
+10a) WITH BASETABLE AS
 (
 	SELECT P.EnglishProductName AS ProductName,
 		SUM(F.SalesAmount) as TotalRevenue
@@ -206,7 +206,7 @@ SELECT *,
 	TotalRevenue *100.0/SUM(TotalRevenue) over () as PercentaeContributionByRegion
 FROM BASETABLE
 
-Percentage contribution of Customers
+10b) Percentage contribution of Customers
 WITH BASETABLE AS
 (
 	SELECT C.CustomerKey,
@@ -223,7 +223,7 @@ SELECT *,
 TotalRevenue *100.0/SUM(TotalRevenue) over () as PercentaeContributionByCustomer
 FROM BASETABLE
 
-WITH BASETABLE AS
+10c) WITH BASETABLE AS
 (
 	SELECT
 		C.EnglishProductCategoryName As ProductCategoryName,
@@ -241,4 +241,268 @@ WITH BASETABLE AS
 SELECT ProductCategoryName,
 	CurrentYearSales * 100.0/SUM(CurrentYearSales) OVER () AS PercentageContribution
 FROM BASETABLE	
+
+
+
+2. Create metrics for customer retention.
+	
+	1. Repeat Purchase Rate : What percentage of customers purchased more than once?
+	WITH BASETABLE AS
+(
+	SELECT F.CustomerKey,
+		CONCAT(C.FirstName, ' ', ISNULL(C.MiddleName + ' ', ''), C.LastName) AS CustomerFullName,
+		COUNT(Distinct F.SalesOrderNumber) AS TotalOrders
+		From FactInternetSales F
+		LEFT JOIN DimCustomer C
+		ON F.CustomerKey = C.CustomerKey
+		GROUP BY F.CustomerKey,
+			CONCAT(C.FirstName, ' ', ISNULL(C.MiddleName + ' ', ''), C.LastName)
+),
+FREQUENCYOFORDER AS
+(
+	SELECT *,
+		CASE
+		When TotalOrders > 1 then 'RepeatPurchase'
+		Else 'SingleOrder'
+		End AS FrequencyOfPurchase
+	From BASETABLE
+)
+SELECT
+	SUM(CASE
+		When FrequencyOfPurchase= 'RepeatPurchase' then 1 ELSE 0 END)*100.0/Count(*)  AS RepeatePurchaseRate
+FROM FREQUENCYOFORDER
+		
+
+	2.Active vs Inactive : Which customers have stopped buying
+		WITH BASETABLE AS
+(
+	SELECT F.CustomerKey,
+	CONCAT(C.FirstName, ' ', ISNULL(C.MiddleName + ' ', ''), C.LastName) AS CustomerFullName,
+	Count(Distinct F.SalesOrderNumber)  AS OrderVolume
+	From FactInternetSales F
+	LEFT JOIN DimCustomer C
+	ON F.CustomerKey = C.CustomerKey
+	GROUP BY F.CustomerKey,
+	CONCAT(C.FirstName, ' ', ISNULL(C.MiddleName + ' ', ''), C.LastName)
+)
+	SELECT *,
+		CASE
+		When TotalOrders > 1 then 'Active'
+		Else 'Inactive'
+		End AS FrequencyOfPurchase
+	From BASETABLE
+
+	3:Average Days Between Purchase: How frequently do customers buy
+	WITH Orders As
+	(		Select Distinct
+				 CustomerKey as CustomerKey,
+				 SalesOrderNumber AS OrderNumber,
+				Cast(OrderDate as Date) as OrderDate
+				from FactInternetSales
+	), IntervalbtwPurchase AS
+			
+	(		Select *,
+				Lag(OrderDate) over (Partition by CustomerKey Order by OrderDate) as PreviousOrderDate
+			From Orders
+	) , INTERVALS as
+
+	(SELECT *,
+		Datediff(Day, PreviousOrderDate, OrderDate) Intervals
+		from IntervalbtwPurchase)
+
+		Select CustomerKey,
+			(Cast(AVG(Cast(Intervals as Decimal(18,2))) as Decimal(18,2))) as AvrDaysbtwO
+		From 	INTERVALS
+		Group by CustomerKey
+	
+	4:Customer Retension Cohort : Of customers acquired in Month X, how many returned later?
+	With BASETABLE AS 
+	(
+	SELECT CustomerKey,
+		Cast(min(OrderDate) as DATE) as FirstOrderDate
+		From FactInternetSales 
+		Group By CustomerKey
+	),Cohorts As
+	(SELECT *,
+		Datepart(Year, FirstOrderDate) AS CohortYear,
+		Datepart(Month, FirstOrderDate) as CohortMonth
+		FROM BASETABLE
+	), OFFSET AS
+	(
+	SELECT C.CustomerKey,
+		C.FirstOrderDate,
+		C.CohortYear,
+		C.CohortMonth,
+		Datepart(Year, F.OrderDate) AS PurchaseYear,
+		Datepart(Month, F.OrderDate) as PurchaseMonth,
+		Datediff(Month, C.FirstOrderDate, F.OrderDate) as Offset
+	FROM Cohorts C
+	LEFT JOIN
+	FactInternetSales F
+	On C.CustomerKey = F.CustomerKey
+	)
+	SELECT CohortYear,
+		CohortMonth,
+		Offset,
+		COUNT(DISTINCT CustomerKey) AS Customers
+	FROM OFFSET
+	GROUP BY
+		CohortYear,
+		CohortMonth,
+		Offset
+	ORDER BY
+		CohortYear,
+		CohortMonth,
+		Offset;
+		
+		
+5.Customer Churn Rate : What percentage of customers became inactive
+
+WITH CLastOrderDate AS
+(
+	SELECT F.CustomerKey AS CustomerKey,
+		Concat(C.FirstName,' ',C.MiddleName, ' ', C.LastName) as CustomerFullName,
+		Max(CAST (OrderDate AS Date)) as CustomerLastOrderDate
+	From FactInternetSales F
+	LEFT JOIN DimCustomer C
+	ON F.CustomerKey = C.CustomerKey
+	GROUP BY  F.CustomerKey,
+		Concat(C.FirstName,' ',C.MiddleName, ' ', C.LastName)
+),
+MAXORDERDATE AS
+(
+	SELECT *,
+	MAX(CustomerLastOrderDate) OVER () AS MaxOrderDate,
+	Datediff(DAY,  CustomerLastOrderDate, MAX(CustomerLastOrderDate)OVER ()) AS InActivePeriod
+	FROM  CLastOrderDate
+),
+FLAG AS
+(
+	SELECT *,
+		CASE
+			WHEN InActivePeriod > 180 THEN 'INACTIVE'
+			WHEN InActivePeriod > 90 THEN 'SEMI-ACTIVE'
+			ELSE 'ACTIVE'
+		END AS Flag
+FROM MAXORDERDATE
+)
+SELECT SUM (Case
+				When Flag = 'INACTIVE' Then 1 else 0 end) *100.0
+				/ Count(*) as PercentageOfInactiveCustomer
+FROM FLAG
+
+
+
+3. Identify leading vs lagging indicators.
+Potential leading indicator: Monthly Repeat Purchase Rate
+Lagging outcome: Monthly Revenue / Revenue Growth
+
+WITH CustomerFirstOrder AS ---Find each customer's first purchase date
+(
+	SELECT F.CustomerKey ,
+		CONCAT(C.FirstName, ' ', ISNULL(C.MiddleName + ' ', ''), C.LastName) AS CustomerName,
+		MIN(CAST(F.OrderDate AS DATE)) AS FirstPurchaseDate
+		From FactInternetSales F
+		LEFT JOIN DimCustomer C
+		ON F.CustomerKey = C.CustomerKey
+		GROUP BY F.CustomerKey,
+			CONCAT(C.FirstName, ' ', ISNULL(C.MiddleName + ' ', ''), C.LastName)
+),
+
+OrderMonthYear AS ---Bring back all customer orders by date by joining first order to factinternetsales to get all order dates
+   
+(  SELECT O.CustomerKey AS CustomerKey,
+			O.FirstPurchaseDate,
+			Datepart(Year, FirstPurchaseDate) as FirstPurchaseYear,
+			Datepart(Month, FirstPurchaseDate) as FirstPurchaseMonth,
+			CAST(I.OrderDate AS Date) AS OrderDate,
+			Datepart(Year, CAST(I.OrderDate AS Date)) as OrderYear,
+			Datepart(Month, CAST(I.OrderDate AS Date)) as OrderMonth
+			FROM CustomerFirstOrder O
+		INNER JOIN FactInternetSales I
+		ON O.CustomerKey = I.CustomerKey
+), 
+
+ReturningvsNewCustomers As  ---Classify each purchase in a month as New / Returning customer purchases
+
+(   SELECT *,
+		CASE
+    WHEN FirstPurchaseYear = OrderYear
+     AND FirstPurchaseMonth = OrderMonth
+    THEN 'NewCustomer'
+    ELSE 'ReturningCustomer'
+END AS CustomerFrequencyOfPurchasePerMonth
+	FROM OrderMonthYear
+)
+
+, MonthlyRCR AS  ---Calculate monthly repeat customer rate
+
+(   SELECT 
+		OrderYear,
+		OrderMonth,
+		COUNT(DISTINCT CASE 
+        WHEN CustomerFrequencyOfPurchasePerMonth = 'ReturningCustomer' 
+        THEN CustomerKey 
+		END) AS ReturningCustomers,
+
+		COUNT(DISTINCT CustomerKey) AS TotalCustomers,
+
+		COUNT(DISTINCT CASE 
+        WHEN CustomerFrequencyOfPurchasePerMonth = 'ReturningCustomer' 
+        THEN CustomerKey 
+		END) * 100.0
+		/ NULLIF(COUNT(DISTINCT CustomerKey), 0) AS MonthlyRepeatCustomerRate
+
+FROM ReturningvsNewCustomers
+GROUP BY 
+    OrderYear,
+    OrderMonth
+--ORDER BY 
+   -- OrderYear,
+    --OrderMonth;
+)
+,	
+---MONTHLY REVENUE GROWTH
+--WITH 
+
+CurrentRevenue AS  --Calculate current month revenue
+(   SELECT DATEPART(YEAR, OrderDate) AS OrderYear,
+		DATEPART(MONTH, OrderDate) AS OrderMonth,
+		SUM(SalesAmount) AS Revenue
+	FROM FactInternetSales
+	GROUP BY DATEPART(YEAR, OrderDate),
+		DATEPART(MONTH, OrderDate)
+) 
+
+, PreviousMonthRevenue AS  ---Use LAG() to get previous-month revenue
+
+(   SELECT *,
+		LAG(Revenue) OVER (ORDER BY OrderYear, OrderMonth) as LastMonthRevenue
+		FROM CurrentRevenue
+) 
+
+, MoMRGrowth AS  ---Calculate MoM revenue growth
+
+(		SELECT OrderYear,
+			OrderMonth,
+			Revenue,
+			LastMonthRevenue,
+			(Revenue-LastMonthRevenue)*100.0/NULLIF(LastMonthRevenue,0) AS MOMRevenueGrowth
+		FROM PreviousMonthRevenue
+)	---JOIN the two monthly KPI datasets to compare %of repeate purchase and MoMRevenue growth
+
+		SELECT M.OrderYear,
+			M.OrderMonth,
+			M.ReturningCustomers,
+			M.TotalCustomers,
+			M.MonthlyRepeatCustomerRate,
+			P.MOMRevenueGrowth,
+			P.Revenue,
+			P.LastMonthRevenue
+		FROM MonthlyRCR M
+		INNER JOIN MoMRGrowth P
+		ON M.OrderYear = p.OrderYear AND M.OrderMonth = P.OrderMonth
+
+		Order by M.OrderYear,
+					M.OrderMonth
 
